@@ -22,7 +22,36 @@ module AgileZen
       response_body = nil
       begin
         response = connection.get do |req|
-          req.url "/api/v1/projects/#{project_id}/story/#{story_id}", options
+          req.url "/api/v1/projects/#{project_id}/stories/#{story_id}", options
+        end
+        response_body = response.body
+      rescue MultiJson::DecodeError => e
+        #p 'Unable to parse JSON.'
+      end
+      
+      response_body
+    end
+    
+    # Retrieve information for an individual story of a given project.
+    def update_project_story(project_id, story_id, data={})
+      response_body = nil
+      
+      begin
+        response = connection.put do |req|
+          req.url "/api/v1/projects/#{project_id}/stories/#{story_id}"
+          
+          unless data.empty?
+            
+            [:phase, :owner, :creator, :project].each do |item|
+              data[item] = data[item].to_i if data[item].present?
+            end       
+            # data[:phase] = data[:phase].to_i if data[:phase].present?
+            #      data[:owner] = data[:owner].to_i if data[:owner].present?
+            #      data[:creator] = data[:creator].to_i if data[:creator].present?
+            #      data[:project] = data[:project].to_i if data[:project].present?
+            req.body = ActiveSupport::JSON.encode(data)
+          end  
+          
         end
         response_body = response.body
       rescue MultiJson::DecodeError => e
@@ -33,4 +62,5 @@ module AgileZen
     end
     
   end
+  
 end
