@@ -32,7 +32,7 @@ module AgileZen
       response_body
     end
     
-    # Retrieve information for an individual story of a given project.
+    # Update information for an individual story of a given project.
     def update_project_story(project_id, story_id, data={})
       response_body = nil
       
@@ -40,15 +40,10 @@ module AgileZen
         response = connection.put do |req|
           req.url "/api/v1/projects/#{project_id}/stories/#{story_id}"
           
-          unless data.empty?
-            
+          unless data.empty?           
             [:phase, :owner, :creator, :project].each do |item|
               data[item] = data[item].to_i if data[item].present?
             end       
-            # data[:phase] = data[:phase].to_i if data[:phase].present?
-            #      data[:owner] = data[:owner].to_i if data[:owner].present?
-            #      data[:creator] = data[:creator].to_i if data[:creator].present?
-            #      data[:project] = data[:project].to_i if data[:project].present?
             req.body = ActiveSupport::JSON.encode(data)
           end  
           
